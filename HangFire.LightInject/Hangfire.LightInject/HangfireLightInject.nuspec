@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Lucuma.HangfireLightInject</id>
+    <version>$version$</version>
+    <title>Hangfire Lightinject Activator</title>
+    <authors>Sam Bosell</authors>
+    <owners>Sam Bosell</owners>
+    <projectUrl>http://github.com/sbosell/Hangfire.LightInject</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      This is the job activator for Hangfire and LightInject.
+    </description>
+    <releaseNotes>
+        
+    </releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <tags>Hangfire,LightInject</tags>
+  </metadata>
+</package>
