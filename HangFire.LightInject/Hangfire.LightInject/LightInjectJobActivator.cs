@@ -9,25 +9,35 @@ namespace Hangfire.LightInject
 {
     public class LightInjectJobActivator : JobActivator
     {
-        private readonly ServiceContainer container;
+        private readonly ServiceContainer _container;
         internal static readonly object LifetimeScopeTag = new object();
    
-        public LightInjectJobActivator(ServiceContainer container)
+        public LightInjectJobActivator(ServiceContainer container, bool selfReferencing=false)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
-            this.container = container;
+
+            this._container = container;
+          
         }
 
         public override object ActivateJob(Type jobType)
         {
-            return container.GetInstance(jobType);
-            //return container.GetInstance(jobType.GetInterfaces().FirstOrDefault());
+            // this will fail if you do self referencing job queues on a class with an interface:
+            //  BackgroundJob.Enqueue(() => this.SendSms(message)); 
+            var instance = _container.TryGetInstance(jobType);
+
+            // since it fails we can try to get the first interface and request from container
+            if (instance==null && jobType.GetInterfaces().Count()>0)
+                instance = _container.GetInstance(jobType.GetInterfaces().FirstOrDefault());
+
+            return instance;
+            
         }
 
         public override JobActivatorScope BeginScope()
         {
-            return new LightInjecterScope(container);
+            return new LightInjecterScope(_container);
         }
 
     }
@@ -35,17 +45,25 @@ namespace Hangfire.LightInject
     class LightInjecterScope : JobActivatorScope
     {
         private readonly ServiceContainer _container;
-
+        
         public LightInjecterScope(ServiceContainer container)
         {
             _container = container;
+            
             _container.BeginScope();
         }
 
-        public override object Resolve(Type type)
+        public override object Resolve(Type jobType)
         {
 
-             return _container.GetInstance(type);
+            var instance = _container.TryGetInstance(jobType);
+
+            // since it fails we can try to get the first interface and request from container
+            if (instance == null && jobType.GetInterfaces().Count() > 0)
+                instance = _container.GetInstance(jobType.GetInterfaces().FirstOrDefault());
+
+            return instance;
+
         }
 
         public override void DisposeScope()
