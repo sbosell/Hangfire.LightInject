@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Lucuma.HangfireLightInject</id>
+    <id>Hangfire.LightInject</id>
     <version>$version$</version>
     <title>Hangfire Lightinject Activator</title>
     <authors>Sam Bosell</authors>
@@ -11,8 +11,12 @@
     <description>
       This is the job activator for Hangfire and LightInject.
     </description>
+    <summary>
+        This is the job activator for Hangfire and LightInject.
+    </summary>
     <releaseNotes>
-        
+        Renamed nuget package to match hangfire's docs
+        Updated to allow self referencing resolution
     </releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Hangfire,LightInject</tags>
