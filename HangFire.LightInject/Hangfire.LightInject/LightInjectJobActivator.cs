@@ -1,9 +1,6 @@
-﻿using Hangfire;
-using LightInject;
+﻿using LightInject;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hangfire.LightInject
 {
@@ -11,14 +8,14 @@ namespace Hangfire.LightInject
     {
         private readonly ServiceContainer _container;
         internal static readonly object LifetimeScopeTag = new object();
-   
-        public LightInjectJobActivator(ServiceContainer container, bool selfReferencing=false)
+
+        public LightInjectJobActivator(ServiceContainer container, bool selfReferencing = false)
         {
             if (container == null)
                 throw new ArgumentNullException("container");
 
             this._container = container;
-          
+
         }
 
         public override object ActivateJob(Type jobType)
@@ -28,11 +25,11 @@ namespace Hangfire.LightInject
             var instance = _container.TryGetInstance(jobType);
 
             // since it fails we can try to get the first interface and request from container
-            if (instance==null && jobType.GetInterfaces().Count()>0)
+            if (instance == null && jobType.GetInterfaces().Count() > 0)
                 instance = _container.GetInstance(jobType.GetInterfaces().FirstOrDefault());
 
             return instance;
-            
+
         }
 
         public override JobActivatorScope BeginScope()
@@ -45,12 +42,13 @@ namespace Hangfire.LightInject
     class LightInjecterScope : JobActivatorScope
     {
         private readonly ServiceContainer _container;
-        
+        private readonly Scope _scope;
+
         public LightInjecterScope(ServiceContainer container)
         {
             _container = container;
-            
-            _container.BeginScope();
+
+            _scope = _container.BeginScope();
         }
 
         public override object Resolve(Type jobType)
@@ -68,12 +66,7 @@ namespace Hangfire.LightInject
 
         public override void DisposeScope()
         {
-            var scope = _container.ScopeManagerProvider.GetScopeManager().CurrentScope;
-            if (scope != null)
-            {
-                _container.EndCurrentScope();
-                scope.Dispose();
-            }
+            _scope?.Dispose();
         }
     }
 }
